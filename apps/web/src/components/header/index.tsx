@@ -3,6 +3,7 @@
 import { UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { CreateSnippetDialog } from '@/components/snippets/create-snippet-dialog'
 
 export function Header() {
   return (
@@ -13,9 +14,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <Button variant="default" size="default">
-            New Snippet
-          </Button>
+          <CreateSnippetDialog />
           <UserButton />
         </div>
       </nav>
