@@ -1,12 +1,13 @@
 module.exports = {
-  // Lint & Prettify TS and JS files
-  '**/*.(ts|tsx|js|jsx)': (filenames) => [
-    `pnpm prettier --write ${filenames.join(' ')}`,
-    `pnpm eslint ${filenames.join(' ')} --fix`,
-  ],
-
-  // Prettify only Markdown and JSON files
-  '**/*.(md|json)': (filenames) => [
-    `pnpm prettier --write ${filenames.join(' ')}`,
-  ],
-}
+    // Prettier can still run on all files
+    "**/*.(md|json)": ["prettier --write"],
+  
+    // Split the JS/TS files handling
+    "apps/web/**/*.(ts|tsx|js|jsx)": [
+      "prettier --write",
+      "cd apps/web && pnpm eslint --fix"
+    ],
+    
+    // For JS/TS files outside web app, only run prettier
+    "!(apps/web)/**/*.(ts|tsx|js|jsx)": ["prettier --write"]
+  }
