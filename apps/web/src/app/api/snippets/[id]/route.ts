@@ -49,17 +49,18 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth()
+    const { id } = await params
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const snippet = await db.snippet.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!snippet) {
@@ -71,7 +72,7 @@ export async function DELETE(
     }
 
     await db.snippet.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
