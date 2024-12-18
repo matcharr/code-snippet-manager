@@ -18,6 +18,7 @@ export async function POST(req: Request) {
         title: body.title,
         language: body.language,
         code: body.code,
+        description: body.description,
         userId,
       },
     })
