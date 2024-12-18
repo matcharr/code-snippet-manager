@@ -13,15 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
-  snippets  Snippet[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
 model Snippet {
   id          String   @id @default(cuid())
   title       String
@@ -30,7 +21,6 @@ model Snippet {
   language    String
   isPublic    Boolean  @default(false)
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
   tags        Tag[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
