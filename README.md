@@ -1,18 +1,68 @@
 # Code Snippet Manager
 
-A modern application for managing and sharing code snippets.
+A modern monorepo application for managing and sharing code snippets.
 
-## Setup
+## Project Structure
 
-1. Install dependencies: `pnpm install`
-2. Copy .env.example to .env and fill in values
-3. Start database: `docker-compose up -d`
-4. Run migrations: `pnpm prisma migrate dev`
-5. Start dev server: `pnpm dev`
+```
+.
+├── apps
+│ └── web # Next.js application
+├── packages # Shared packages (future use)
+└── README.md # You are here
+```
+
+## Prerequisites
+
+- Node.js 20.10.0 or higher
+- pnpm 9.15.0 or higher
+- Docker (for PostgreSQL database)
+
+## Quick Start
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Set up environment variables:
+
+   ```bash
+   cp apps/web/.env.example apps/web/.env.local
+   ```
+
+3. Start development:
+   ```bash
+   pnpm dev
+   ```
+
+## Available Scripts
+
+- `pnpm dev` - Start all applications in development mode
+- `pnpm build` - Build all applications
+- `pnpm test` - Run tests across all applications
+- `pnpm lint` - Run linting across all applications
+- `pnpm type-check` - Run type checking across all applications
+
+## Applications
+
+- [Web App](apps/web/README.md) - Main web application for managing code snippets
 
 ## Development
 
-- `pnpm dev` - Start development server
-- `pnpm test` - Run tests
-- `pnpm build` - Build for production
-- `pnpm lint` - Run linter
+- Node.js version: 20.10.0
+- Package Manager: pnpm 9.15.0
+- Build System: Turborepo
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+ISC
