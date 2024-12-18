@@ -2,6 +2,7 @@
   "name": "code-snippet-manager",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "type-check": "turbo type-check",
