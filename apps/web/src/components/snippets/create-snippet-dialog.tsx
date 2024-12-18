@@ -32,6 +32,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Textarea } from '@/components/ui/textarea'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   title: z
@@ -52,6 +53,7 @@ export function CreateSnippetDialog() {
   const [open, setOpen] = useState(false)
   const [editorLanguage, setEditorLanguage] = useState('javascript')
   const { toast } = useToast()
+  const router = useRouter()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -84,6 +86,7 @@ export function CreateSnippetDialog() {
 
       form.reset()
       setOpen(false)
+      router.refresh()
     } catch (error) {
       toast({
         title: 'Error',
