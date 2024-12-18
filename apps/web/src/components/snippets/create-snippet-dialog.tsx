@@ -30,12 +30,14 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
+import { Textarea } from '@/components/ui/textarea'
 
 const formSchema = z.object({
   title: z
     .string()
     .min(1, 'Title is required')
     .max(100, 'Title cannot exceed 100 characters'),
+  description: z.string().optional(),
   language: z.string().min(1, 'Please select a language'),
   code: z
     .string()
@@ -109,6 +111,22 @@ export function CreateSnippetDialog() {
                   <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input placeholder="My awesome snippet" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe your snippet..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
