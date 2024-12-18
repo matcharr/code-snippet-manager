@@ -29,6 +29,7 @@ import Editor from '@monaco-editor/react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import { useToast } from '@/hooks/use-toast'
 
 const formSchema = z.object({
   title: z
@@ -45,7 +46,9 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function CreateSnippetDialog() {
+  const [open, setOpen] = useState(false)
   const [editorLanguage, setEditorLanguage] = useState('javascript')
+  const { toast } = useToast()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -57,13 +60,38 @@ export function CreateSnippetDialog() {
     mode: 'onChange',
   })
 
-  function onSubmit(data: FormValues) {
-    console.log(data)
-    // TODO: Save to database
+  async function onSubmit(data: FormValues) {
+    try {
+      const response = await fetch('/api/snippets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create snippet')
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Snippet created successfully',
+      })
+
+      form.reset()
+      setOpen(false)
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to create snippet',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default">New Snippet</Button>
       </DialogTrigger>
@@ -140,7 +168,7 @@ export function CreateSnippetDialog() {
               type="submit"
               disabled={!form.formState.isValid || form.formState.isSubmitting}
             >
-              Create Snippet
+              {form.formState.isSubmitting ? 'Creating...' : 'Create Snippet'}
             </Button>
           </form>
         </Form>
