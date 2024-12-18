@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
@@ -20,6 +22,8 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
       - run: pnpm install
+      - name: Generate Prisma Client
+        run: cd apps/web && pnpm prisma:generate
       - run: pnpm type-check
       - run: pnpm lint
       - run: pnpm test
