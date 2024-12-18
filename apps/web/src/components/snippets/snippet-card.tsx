@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { EditSnippetDialog } from '@/components/snippets/edit-snippet-dialog'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface SnippetCardProps {
   snippet: {
@@ -30,8 +31,10 @@ interface SnippetCardProps {
 export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
-  async function handleDelete() {
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation()
     try {
       const response = await fetch(`/api/snippets/${snippet.id}`, {
         method: 'DELETE',
@@ -56,17 +59,25 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
     }
   }
 
+  function handleCardClick() {
+    router.push(`/snippets/${snippet.id}`)
+  }
+
   return (
     <>
-      <Card className="transition-shadow hover:shadow-md">
+      <Card
+        className="transition-shadow hover:shadow-md cursor-pointer"
+        onClick={handleCardClick}
+      >
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
-            <Link href={`/snippets/${snippet.id}`}>
-              <CardTitle className="text-lg font-semibold hover:underline">
-                {snippet.title}
-              </CardTitle>
-            </Link>
-            <div className="flex items-center gap-2">
+            <CardTitle className="text-lg font-semibold">
+              {snippet.title}
+            </CardTitle>
+            <div
+              className="flex items-center gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
               <span className="text-sm text-muted-foreground bg-secondary px-2 py-1 rounded-md">
                 {snippet.language}
               </span>
