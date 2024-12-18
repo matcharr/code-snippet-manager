@@ -7,24 +7,27 @@ export async function POST(req: Request) {
     const { userId } = await auth()
 
     if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await req.json()
-    const { title, language, code } = body
+    console.log('API received:', { body, userId })
 
     const snippet = await db.snippet.create({
       data: {
-        title,
-        language,
-        code,
+        title: body.title,
+        language: body.language,
+        code: body.code,
         userId,
       },
     })
 
-    return NextResponse.json(snippet)
+    return NextResponse.json({ data: snippet }, { status: 201 })
   } catch (error) {
-    console.error('[SNIPPETS_POST]', error)
-    return new NextResponse('Internal Error', { status: 500 })
+    console.error('API error:', error)
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    )
   }
 }
