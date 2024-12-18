@@ -65,4 +65,4 @@ A modern monorepo application for managing and sharing code snippets.
 
 ## License
 
-ISC
+MIT
