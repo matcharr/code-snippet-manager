@@ -1,21 +1,21 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { type NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 
 export async function PATCH(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth()
+    const { id } = await params
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const snippet = await db.snippet.findUnique({
-      where: { id: context.params.id },
+      where: { id },
     })
 
     if (!snippet) {
@@ -29,7 +29,7 @@ export async function PATCH(
     const body = await request.json()
 
     const updatedSnippet = await db.snippet.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         title: body.title,
         language: body.language,
@@ -49,18 +49,19 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth()
+    const { id } = await params
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const snippet = await db.snippet.findUnique({
-      where: { id: context.params.id },
+      where: { id },
     })
 
     if (!snippet) {
@@ -72,7 +73,7 @@ export async function DELETE(
     }
 
     await db.snippet.delete({
-      where: { id: context.params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
