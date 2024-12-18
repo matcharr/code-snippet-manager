@@ -49,7 +49,7 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
         description: 'Snippet deleted successfully',
       })
 
-      onDelete?.()
+      router.refresh()
     } catch (error) {
       toast({
         title: 'Error',
