@@ -1,17 +1,28 @@
-'use client'
+import { SnippetCard } from '@/components/snippets/snippet-card'
+import { db } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 
-import { useUser } from '@clerk/nextjs'
+export default async function Home() {
+  const { userId } = await auth()
 
-export default function Home() {
-  const { user } = useUser()
+  const snippets = await db.snippet.findMany({
+    where: {
+      userId: userId!,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
 
   return (
     <main className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">My Code Snippets</h1>
-      <p>
-        Welcome{user?.username ? `, ${user.username}` : ''}! Let's manage your
-        code snippets.
-      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {snippets.map((snippet) => (
+          <SnippetCard key={snippet.id} snippet={snippet} />
+        ))}
+      </div>
     </main>
   )
 }
