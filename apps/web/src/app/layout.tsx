@@ -15,7 +15,7 @@ export default function RootLayout({
   const isAuthPage = pathname?.startsWith('/sign-')
 
   return (
-    <ClerkProvider signInFallbackRedirectUrl="/">
+    <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
       <html lang="en">
         <body
           className={
