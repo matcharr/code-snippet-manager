@@ -32,22 +32,23 @@ jobs:
       - name: Generate Prisma Client
         run: cd apps/web && pnpm prisma:generate
       
-      # Cache Prisma after generation
+      # Cache Prisma (more specific paths)
       - name: Cache Prisma
         uses: actions/cache@v3
         with:
-          path: |
-            apps/web/node_modules/.prisma
-            apps/web/node_modules/@prisma/client
-          key: ${{ runner.os }}-prisma-${{ hashFiles('apps/web/prisma/schema.prisma') }}
+          path: apps/web/node_modules/.prisma/client
+          key: ${{ runner.os }}-prisma-client-${{ hashFiles('apps/web/prisma/schema.prisma') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-client-
       
-      # Cache Next.js
+      # Cache Next.js (more specific paths)
       - name: Cache Next.js
         uses: actions/cache@v3
         with:
-          path: |
-            apps/web/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: apps/web/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('apps/web/next.config.ts') }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
       
       - run: pnpm type-check
       - run: pnpm lint
