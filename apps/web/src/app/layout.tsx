@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import { Header } from '@/components/header'
 import './globals.css'
+import { Toaster } from '@/components/ui/toaster'
 
 export default function RootLayout({
   children,
@@ -22,6 +23,7 @@ export default function RootLayout({
         >
           {!isAuthPage && <Header />}
           {children}
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

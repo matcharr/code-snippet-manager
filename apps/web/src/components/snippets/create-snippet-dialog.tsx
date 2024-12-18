@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import {
   Form,
@@ -100,6 +101,9 @@ export function CreateSnippetDialog() {
       <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>Create Snippet</DialogTitle>
+          <DialogDescription>
+            Create a new code snippet. Fill in the details below.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
