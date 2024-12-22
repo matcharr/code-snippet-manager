@@ -7,6 +7,10 @@ import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { CommandPalette } from '@/components/command/command-palette'
+import {
+  CreateSnippetProvider,
+  CreateSnippetDialog,
+} from '@/components/snippets/create-snippet-dialog'
 
 export default function RootLayout({
   children,
@@ -31,9 +35,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {!isAuthPage && <Header />}
-            {children}
-            <CommandPalette />
+            <CreateSnippetProvider>
+              {!isAuthPage && <Header />}
+              {children}
+              <CreateSnippetDialog />
+              <CommandPalette />
+            </CreateSnippetProvider>
             <Toaster />
           </ThemeProvider>
         </body>

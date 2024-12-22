@@ -1,12 +1,12 @@
 'use client'
 
+import { createContext, useContext, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog'
 import {
@@ -29,7 +29,6 @@ import { useForm } from 'react-hook-form'
 import Editor from '@monaco-editor/react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
@@ -49,8 +48,45 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export function CreateSnippetDialog() {
+const CreateSnippetContext = createContext<{
+  open: boolean
+  setOpen: (open: boolean) => void
+  onOpen: () => void
+  onClose: () => void
+} | null>(null)
+
+export function useCreateSnippetContext() {
+  const context = useContext(CreateSnippetContext)
+  if (!context)
+    throw new Error(
+      'useCreateSnippetContext must be used within CreateSnippetProvider'
+    )
+  return context
+}
+
+export function CreateSnippetProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [open, setOpen] = useState(false)
+
+  return (
+    <CreateSnippetContext.Provider
+      value={{
+        open,
+        setOpen,
+        onOpen: () => setOpen(true),
+        onClose: () => setOpen(false),
+      }}
+    >
+      {children}
+    </CreateSnippetContext.Provider>
+  )
+}
+
+export function CreateSnippetDialog() {
+  const { open, setOpen } = useCreateSnippetContext()
   const [editorLanguage, setEditorLanguage] = useState('javascript')
   const { toast } = useToast()
   const router = useRouter()
@@ -98,103 +134,122 @@ export function CreateSnippetDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default">New Snippet</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px]">
-        <DialogHeader>
+      <DialogContent className="max-w-[90vw] w-[800px] max-h-[85vh] flex flex-col gap-0">
+        <DialogHeader className="flex-none px-6 pt-6">
           <DialogTitle>Create Snippet</DialogTitle>
           <DialogDescription>
             Create a new code snippet. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="My awesome snippet" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe your snippet..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="language"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Language</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value)
-                      setEditorLanguage(value)
-                    }}
-                    defaultValue={field.value}
-                  >
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4 flex-1 overflow-hidden"
+          >
+            <div className="flex flex-col gap-4 overflow-y-auto px-6">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
+                      <Input placeholder="My awesome snippet" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="javascript">JavaScript</SelectItem>
-                      <SelectItem value="typescript">TypeScript</SelectItem>
-                      <SelectItem value="python">Python</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Editor
-                      height="300px"
-                      language={editorLanguage}
-                      value={field.value}
-                      onChange={field.onChange}
-                      theme="vs-dark"
-                      options={{
-                        minimap: { enabled: false },
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormLabel>Description (optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your snippet..."
+                        className="resize-none h-20"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormLabel>Language</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        setEditorLanguage(value)
                       }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={!form.formState.isValid || form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? 'Creating...' : 'Create Snippet'}
-            </Button>
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="javascript">JavaScript</SelectItem>
+                        <SelectItem value="typescript">TypeScript</SelectItem>
+                        <SelectItem value="python">Python</SelectItem>
+                        {/* Add more languages as needed */}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem className="flex-1 min-h-[300px]">
+                    <FormLabel>Code</FormLabel>
+                    <FormControl>
+                      <div className="relative h-[300px] border rounded-md">
+                        <Editor
+                          height="100%"
+                          language={editorLanguage}
+                          value={field.value}
+                          onChange={field.onChange}
+                          theme="vs-dark"
+                          options={{
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: 'on',
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex justify-end pt-4 border-t px-6 sticky bottom-0 bg-background pb-6">
+              <Button
+                type="submit"
+                disabled={
+                  !form.formState.isValid || form.formState.isSubmitting
+                }
+              >
+                {form.formState.isSubmitting ? 'Creating...' : 'Create Snippet'}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

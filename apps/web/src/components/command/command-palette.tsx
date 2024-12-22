@@ -1,18 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Command } from 'cmdk'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dialog } from '@/components/ui/dialog'
 import { Plus, Home, Search, Settings } from 'lucide-react'
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from '@/components/ui/command'
+import { useCreateSnippetContext } from '@/components/snippets/create-snippet-dialog'
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
+import { DialogTitle } from '@/components/ui/dialog'
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
+  const { onOpen: openCreateDialog } = useCreateSnippetContext()
+
+  useKeyboardShortcuts({
+    onCreateSnippet: openCreateDialog,
+  })
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setOpen((open) => !open)
       }
@@ -23,46 +39,57 @@ export function CommandPalette() {
   }, [])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Command className="rounded-lg border shadow-md">
-        <Command.Input placeholder="Type a command..." />
-        <Command.List className="max-h-[300px] overflow-y-auto p-2">
-          <Command.Group heading="Navigation">
-            <Command.Item
-              onSelect={() => {
-                router.push('/')
-                setOpen(false)
-              }}
-              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent"
-            >
-              <Home className="h-4 w-4" />
-              Go to Home
-            </Command.Item>
-            <Command.Item
-              onSelect={() => {
-                router.push('/search')
-                setOpen(false)
-              }}
-              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent"
-            >
-              <Search className="h-4 w-4" />
-              Search Snippets
-            </Command.Item>
-          </Command.Group>
-          <Command.Group heading="Actions">
-            <Command.Item
-              onSelect={() => {
-                router.push('/new')
-                setOpen(false)
-              }}
-              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent"
-            >
-              <Plus className="h-4 w-4" />
-              Create New Snippet
-            </Command.Item>
-          </Command.Group>
-        </Command.List>
-      </Command>
-    </Dialog>
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <DialogTitle className="sr-only">Command Menu</DialogTitle>
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Navigation">
+          <CommandItem
+            onSelect={() => {
+              router.push('/')
+              setOpen(false)
+            }}
+          >
+            <Home className="mr-2 h-4 w-4" />
+            <span>Home</span>
+            <CommandShortcut>⌘H</CommandShortcut>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => {
+              router.push('/search')
+              setOpen(false)
+            }}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            <span>Search Snippets</span>
+            <CommandShortcut>⌘F</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Actions">
+          <CommandItem
+            onSelect={() => {
+              openCreateDialog()
+              setOpen(false)
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            <span>New Snippet</span>
+            <CommandShortcut>⌘I</CommandShortcut>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => {
+              router.push('/settings')
+              setOpen(false)
+            }}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+            <CommandShortcut>⌘,</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
   )
 }
