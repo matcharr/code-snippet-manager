@@ -15,6 +15,7 @@ import { EditSnippetDialog } from '@/components/snippets/edit-snippet-dialog'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { CodeBlock } from '@/components/ui/code-block'
 
 interface SnippetCardProps {
   snippet: {
@@ -110,12 +111,15 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
           )}
         </CardHeader>
         <CardContent>
-          <pre className="bg-secondary/50 p-4 rounded-md overflow-x-auto">
-            <code className="text-sm font-mono">{snippet.code}</code>
-          </pre>
-          <p className="text-xs text-muted-foreground mt-4">
-            Created {formatDistanceToNow(new Date(snippet.createdAt))} ago
-          </p>
+          <div className="bg-secondary/50 rounded-md">
+            <pre className="p-3 text-xs font-mono overflow-hidden">
+              <code>{snippet.code.split('\n')[0]}</code>
+            </pre>
+          </div>
+          <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+            <span>{snippet.language}</span>
+            <span>{formatDistanceToNow(new Date(snippet.createdAt))} ago</span>
+          </div>
         </CardContent>
       </Card>
       <EditSnippetDialog

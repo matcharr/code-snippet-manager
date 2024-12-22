@@ -1,7 +1,7 @@
 'use client'
 
-import Editor from '@monaco-editor/react'
 import { formatDistanceToNow } from 'date-fns'
+import { CodeBlock } from '@/components/ui/code-block'
 
 interface SnippetViewProps {
   snippet: {
@@ -16,9 +16,9 @@ interface SnippetViewProps {
 
 export function SnippetView({ snippet }: SnippetViewProps) {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-start">
+    <div className="container mx-auto p-4 min-h-[calc(100vh-4rem)]">
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div>
             <h1 className="text-2xl font-bold">{snippet.title}</h1>
             {snippet.description && (
@@ -27,24 +27,19 @@ export function SnippetView({ snippet }: SnippetViewProps) {
               </p>
             )}
           </div>
-          <span className="text-sm text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+          <span className="text-sm text-muted-foreground bg-secondary px-2 py-1 rounded-md self-start">
             {snippet.language}
           </span>
         </div>
-        <p className="text-sm text-muted-foreground mt-4">
+        <p className="text-sm text-muted-foreground">
           Created {formatDistanceToNow(new Date(snippet.createdAt))} ago
         </p>
       </div>
-      <Editor
-        height="500px"
-        language={snippet.language}
-        value={snippet.code}
-        theme="vs-dark"
-        options={{
-          readOnly: true,
-          minimap: { enabled: false },
-        }}
-      />
+      <div className="overflow-auto rounded-lg">
+        <div className="min-w-full bg-secondary/50 p-4">
+          <CodeBlock code={snippet.code} language={snippet.language} />
+        </div>
+      </div>
     </div>
   )
 }
