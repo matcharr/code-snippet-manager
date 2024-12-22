@@ -1,9 +1,9 @@
 'use client'
 
 import { UserButton } from '@clerk/nextjs'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { CreateSnippetDialog } from '@/components/snippets/create-snippet-dialog'
+import { ModeToggle } from '@/components/theme/mode-toggle'
 
 export function Header() {
   return (
@@ -14,6 +14,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <CreateSnippetDialog />
           <UserButton />
         </div>

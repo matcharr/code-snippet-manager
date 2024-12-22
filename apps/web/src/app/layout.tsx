@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { Header } from '@/components/header'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
+import { ThemeProvider } from '@/components/theme/theme-provider'
+import { CommandPalette } from '@/components/command/command-palette'
 
 export default function RootLayout({
   children,
@@ -16,15 +18,24 @@ export default function RootLayout({
 
   return (
     <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
+          suppressHydrationWarning
           className={
             isAuthPage ? 'flex min-h-screen items-center justify-center' : ''
           }
         >
-          {!isAuthPage && <Header />}
-          {children}
-          <Toaster />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {!isAuthPage && <Header />}
+            {children}
+            <CommandPalette />
+            <Toaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
