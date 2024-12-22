@@ -60,7 +60,14 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
     }
   }
 
-  function handleCardClick() {
+  const handleClick = (e: React.MouseEvent) => {
+    if (
+      window.getSelection()?.toString() ||
+      e.target instanceof HTMLButtonElement ||
+      (e.target as HTMLElement).closest('[role="menuitem"]')
+    ) {
+      return
+    }
     router.push(`/snippets/${snippet.id}`)
   }
 
@@ -68,11 +75,11 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
     <>
       <Card
         className="transition-shadow hover:shadow-md cursor-pointer"
-        onClick={handleCardClick}
+        onClick={handleClick}
       >
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="text-lg font-semibold select-text">
               {snippet.title}
             </CardTitle>
             <div
@@ -89,23 +96,23 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
+                  <DropdownMenuItem className="flex gap-2">
+                    <Pencil className="h-4 w-4" />
+                    <span>Edit</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-destructive"
+                    className="flex gap-2 text-destructive focus:text-destructive"
                     onClick={handleDelete}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    <Trash2 className="h-4 w-4" />
+                    <span>Delete</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
           {snippet.description && (
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 select-text">
               {snippet.description}
             </p>
           )}
