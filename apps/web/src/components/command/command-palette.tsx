@@ -1,8 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Plus, Home, Search, Settings } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   CommandDialog,
   CommandEmpty,
@@ -10,33 +8,44 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from '@/components/ui/command'
-import { useCreateSnippetContext } from '@/components/snippets/create-snippet-dialog'
-import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
+import { useEffect, useState } from 'react'
+import { useCreateSnippetContext } from '../snippets/create-snippet-dialog'
+import { SearchIcon } from 'lucide-react'
 import { DialogTitle } from '@/components/ui/dialog'
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
   const { onOpen: openCreateDialog } = useCreateSnippetContext()
-
-  useKeyboardShortcuts({
-    onCreateSnippet: openCreateDialog,
-  })
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen((open) => !open)
       }
     }
-
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
   }, [])
+
+  const runCommand = (command: () => void) => {
+    setOpen(false)
+    command()
+  }
+
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams)
+    if (term) {
+      params.set('q', term)
+    } else {
+      params.delete('q')
+    }
+    router.push(`/?${params.toString()}`)
+    setOpen(false)
+  }
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
@@ -44,49 +53,20 @@ export function CommandPalette() {
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Navigation">
-          <CommandItem
-            onSelect={() => {
-              router.push('/')
-              setOpen(false)
-            }}
-          >
-            <Home className="mr-2 h-4 w-4" />
-            <span>Home</span>
-            <CommandShortcut>⌘H</CommandShortcut>
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={() => runCommand(openCreateDialog)}>
+            Create new snippet
           </CommandItem>
-          <CommandItem
-            onSelect={() => {
-              router.push('/search')
-              setOpen(false)
-            }}
-          >
-            <Search className="mr-2 h-4 w-4" />
-            <span>Search Snippets</span>
-            <CommandShortcut>⌘F</CommandShortcut>
+          <CommandItem onSelect={() => runCommand(() => router.push('/'))}>
+            View all snippets
           </CommandItem>
         </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Actions">
+        <CommandGroup heading="Search">
           <CommandItem
-            onSelect={() => {
-              openCreateDialog()
-              setOpen(false)
-            }}
+            onSelect={() => handleSearch(searchParams.get('q') || '')}
           >
-            <Plus className="mr-2 h-4 w-4" />
-            <span>New Snippet</span>
-            <CommandShortcut>⌘I</CommandShortcut>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => {
-              router.push('/settings')
-              setOpen(false)
-            }}
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-            <CommandShortcut>⌘,</CommandShortcut>
+            <SearchIcon className="mr-2 h-4 w-4" />
+            Search snippets
           </CommandItem>
         </CommandGroup>
       </CommandList>
