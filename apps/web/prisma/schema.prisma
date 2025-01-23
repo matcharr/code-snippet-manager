@@ -27,7 +27,12 @@ model Snippet {
 }
 
 model Tag {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  snippets Snippet[]
+  id        String    @id @default(cuid())
+  name      String
+  userId    String
+  snippets  Snippet[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, userId])
 }

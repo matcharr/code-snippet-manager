@@ -1,36 +1,59 @@
 import { db } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
-import { SnippetCard } from '@/components/snippets/snippet-card'
+import { SnippetSkeleton } from '@/components/snippets/snippet-skeleton'
+import { Suspense } from 'react'
+import { SearchSnippets } from '@/components/search/search-snippets'
+import { SortSnippets } from '@/components/snippets/sort-snippets'
+import { SnippetGrid } from '@/components/snippets/snippet-grid'
+import { Snippet } from '@/types/snippet'
 
-interface Snippet {
-  id: string
-  title: string
-  description?: string | null
-  language: string
-  code: string
-  createdAt: Date
+interface PageProps {
+  searchParams: { q?: string; sort?: string }
 }
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps) {
   const { userId } = await auth()
+  const query = searchParams.q
+  const sort = searchParams.sort ?? 'newest'
 
-  const snippets = await db.snippet.findMany({
+  if (!userId) {
+    return null
+  }
+
+  const snippets = (await db.snippet.findMany({
     where: {
-      userId: userId!,
+      userId,
+      OR: query
+        ? [
+            { title: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } },
+            { code: { contains: query, mode: 'insensitive' } },
+          ]
+        : undefined,
     },
     orderBy: {
-      createdAt: 'desc',
+      ...(sort === 'newest' && { createdAt: 'desc' }),
+      ...(sort === 'oldest' && { createdAt: 'asc' }),
+      ...(sort === 'title' && { title: 'asc' }),
+      ...(sort === 'language' && { language: 'asc' }),
     },
-  })
+    include: {
+      tags: true,
+    },
+  })) satisfies Snippet[]
 
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">My Code Snippets</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {snippets.map((snippet: Snippet) => (
-          <SnippetCard key={snippet.id} snippet={snippet} />
-        ))}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">My Code Snippets</h1>
+        <div className="flex items-center gap-4">
+          <SortSnippets />
+          <SearchSnippets />
+        </div>
       </div>
+      <Suspense fallback={<SnippetSkeleton />}>
+        <SnippetGrid snippets={snippets} />
+      </Suspense>
     </main>
   )
 }
