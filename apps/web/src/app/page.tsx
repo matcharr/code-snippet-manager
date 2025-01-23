@@ -7,14 +7,15 @@ import { SortSnippets } from '@/components/snippets/sort-snippets'
 import { SnippetGrid } from '@/components/snippets/snippet-grid'
 import { Snippet } from '@/types/snippet'
 
-interface PageProps {
-  searchParams: { q?: string; sort?: string }
-}
-
-export default async function Home({ searchParams }: PageProps) {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string }>
+}) {
   const { userId } = await auth()
-  const query = searchParams.q
-  const sort = searchParams.sort ?? 'newest'
+  const params = await searchParams
+  const query = params.q
+  const sort = params.sort ?? 'newest'
 
   if (!userId) {
     return null

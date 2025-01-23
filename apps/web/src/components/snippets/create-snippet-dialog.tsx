@@ -85,6 +85,7 @@ export function CreateSnippetProvider({
   )
 }
 
+// Remove the interface and props
 export function CreateSnippetDialog() {
   const { open, setOpen } = useCreateSnippetContext()
   const [editorLanguage, setEditorLanguage] = useState('javascript')
@@ -199,10 +200,27 @@ export function CreateSnippetDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="bash">Bash</SelectItem>
+                        <SelectItem value="c">C</SelectItem>
+                        <SelectItem value="cpp">C++</SelectItem>
+                        <SelectItem value="csharp">C#</SelectItem>
+                        <SelectItem value="css">CSS</SelectItem>
+                        <SelectItem value="dockerfile">Dockerfile</SelectItem>
+                        <SelectItem value="go">Go</SelectItem>
+                        <SelectItem value="html">HTML</SelectItem>
+                        <SelectItem value="java">Java</SelectItem>
                         <SelectItem value="javascript">JavaScript</SelectItem>
-                        <SelectItem value="typescript">TypeScript</SelectItem>
+                        <SelectItem value="json">JSON</SelectItem>
+                        <SelectItem value="kotlin">Kotlin</SelectItem>
+                        <SelectItem value="markdown">Markdown</SelectItem>
+                        <SelectItem value="php">PHP</SelectItem>
                         <SelectItem value="python">Python</SelectItem>
-                        {/* Add more languages as needed */}
+                        <SelectItem value="ruby">Ruby</SelectItem>
+                        <SelectItem value="rust">Rust</SelectItem>
+                        <SelectItem value="sql">SQL</SelectItem>
+                        <SelectItem value="swift">Swift</SelectItem>
+                        <SelectItem value="typescript">TypeScript</SelectItem>
+                        <SelectItem value="yaml">YAML</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

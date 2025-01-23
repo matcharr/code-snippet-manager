@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CodeBlock } from '@/components/ui/code-block'
+import { CopyButton } from './copy-button'
 
 interface SnippetCardProps {
   snippet: {
@@ -118,14 +119,23 @@ export function SnippetCard({ snippet, onDelete }: SnippetCardProps) {
           )}
         </CardHeader>
         <CardContent>
-          <div className="bg-secondary/50 rounded-md">
-            <pre className="p-3 text-xs font-mono overflow-hidden">
-              <code>{snippet.code.split('\n')[0]}</code>
-            </pre>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-            <span>{snippet.language}</span>
-            <span>{formatDistanceToNow(new Date(snippet.createdAt))} ago</span>
+          <div className="border rounded-lg p-4 space-y-2 group relative">
+            <div className="bg-secondary/50 rounded-md">
+              <CodeBlock
+                code={
+                  snippet.code.length > 150
+                    ? `${snippet.code.slice(0, 150)}...`
+                    : snippet.code
+                }
+                language={snippet.language}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+              <span>{snippet.language}</span>
+              <span>
+                {formatDistanceToNow(new Date(snippet.createdAt))} ago
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
